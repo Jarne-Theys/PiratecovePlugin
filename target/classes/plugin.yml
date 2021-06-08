@@ -1,0 +1,12 @@
+name: getServerInfo
+version: 1.0
+main: tk.piratecove.getServerInfo.getServerInfo
+load: STARTUP
+description: Grabs some server info and writes it to a file (to be used on a website)
+author: CaptainCapsize
+
+commands:
+  writePlayers:
+    description: Write all players and their gamemodes to a file
+    usage: /<command>
+    permission: getServerInfo.writePlayers
