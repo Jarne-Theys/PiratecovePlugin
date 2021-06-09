@@ -22,8 +22,6 @@ public class writePlayers implements CommandExecutor {
             File file = new File("C:\\MCServerFiles\\players.txt");
             if (file.createNewFile()) {
                 log.info("A new players file has been created");
-            } else {
-                log.info("A players file already exists");
             }
         } catch (IOException exception) {
             log.info("An IOException has occured during the creation of the players file");
@@ -46,6 +44,7 @@ public class writePlayers implements CommandExecutor {
             log.info("An IOException has occured during the writing of the players file");
 
         }
+        log.info("Succesfully updated players file");
         return true;
     }
 }
