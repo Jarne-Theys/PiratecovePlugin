@@ -17,22 +17,18 @@ public class writePlayers implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         Logger log = Bukkit.getLogger();
-        if(!commandSender.getName().equalsIgnoreCase("OGCaptainCapsize") && commandSender instanceof Player){
-            log.info(commandSender.getName() + " Tried to use the writePlayers command");
-        }
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
         try {
-            File file = new File("players.txt");
+            File file = new File("C:\\MCServerFiles\\players.txt");
             if (file.createNewFile()) {
                 log.info("A new players file has been created");
-            } else {
-                log.info("A players file already exists");
             }
         } catch (IOException exception) {
             log.info("An IOException has occured during the creation of the players file");
         }
         try {
-            FileWriter fileWriter = new FileWriter("players.txt");
+            String result = "";
+            FileWriter fileWriter = new FileWriter("C:\\MCServerFiles\\players.txt");
             for (Object player : players) {
                 if (player instanceof Player) {
                     Player player1 = (Player) player;
@@ -44,9 +40,13 @@ public class writePlayers implements CommandExecutor {
                     fileWriter.close();
                 }
             }
+            fileWriter.write(result);
+            fileWriter.flush();
+            fileWriter.close();
         } catch (IOException exception) {
             log.info("An IOException has occured during the writing of the players file");
         }
+        log.info("Succesfully updated players file");
         return true;
     }
 }
