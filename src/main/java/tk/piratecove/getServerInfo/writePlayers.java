@@ -37,15 +37,15 @@ public class writePlayers implements CommandExecutor {
                 if (player instanceof Player) {
                     Player player1 = (Player) player;
                     String playername = player1.getName();
-                    String gamemode = player1.getGameMode().toString();
-                    fileWriter.write("Playername: " + playername + " Gamemode: " + gamemode);
+                    double health = player1.getHealth();
+                    int lifetime = player1.getTicksLived()/20;
+                    fileWriter.write("Playername: " + playername + " Health: " + health + " Lifetime: " + lifetime);
                     fileWriter.flush();
                     fileWriter.close();
                 }
             }
         } catch (IOException exception) {
             log.info("An IOException has occured during the writing of the players file");
-
         }
         return true;
     }
