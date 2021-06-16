@@ -1,2 +1,7 @@
-tk\piratecove\getServerInfo\writePlayers.class
-tk\piratecove\getServerInfo\getServerInfo.class
+tk\piratecove\getServerInfo\Smite.class
+tk\piratecove\getServerInfo\Explode.class
+tk\piratecove\getServerInfo\Home.class
+tk\piratecove\getServerInfo\TPA.class
+tk\piratecove\getServerInfo\IsSlimeChunk.class
+tk\piratecove\getServerInfo\GetServerInfo.class
+tk\piratecove\getServerInfo\WritePlayers.class

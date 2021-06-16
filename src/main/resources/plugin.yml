@@ -1,12 +1,26 @@
-name: getServerInfo
-version: 1.1
-main: tk.piratecove.getServerInfo.getServerInfo
+name: GetServerInfo
+version: 1.3
+main: tk.piratecove.GetServerInfo.GetServerInfo
 load: STARTUP
-description: Grabs some server info and writes it to a file (to be used on a website)
 author: CaptainCapsize
 
 commands:
   writePlayers:
     description: Write all players and their gamemodes to a file
     usage: /<command>
-    permission: getServerInfo.writePlayers
+    permission: GetServerInfo.WritePlayers
+  explode:
+    description: Explode somebody, and optionally the blocks around them
+    usage: /<command> playername blocks
+    permission: GetServerInfo.Explode
+  isSlimeChunk:
+    description: Check if the current chunk is a slime chunk
+    usage: /<command>
+  smite:
+    description: Smite a player, and optionally do damage
+    usage: /<command> player damage
+    permission: GetServerInfo.Smite
+  home:
+    description: Teleport yourself to your spawn location
+    usage: /<command>
+

@@ -1,4 +1,4 @@
-package tk.piratecove.getServerInfo;
+package tk.piratecove.GetServerInfo;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -9,11 +9,10 @@ import org.bukkit.entity.Player;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Logger;
 
-public class writePlayers implements CommandExecutor {
+public class WritePlayers implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         Logger log = Bukkit.getLogger();
@@ -27,7 +26,6 @@ public class writePlayers implements CommandExecutor {
             log.info("An IOException has occured during the creation of the players file");
         }
         try {
-            String result = "";
             FileWriter fileWriter = new FileWriter("C:\\MCServerFiles\\players.txt");
             for (Object player : players) {
                 if (player instanceof Player) {
@@ -40,9 +38,6 @@ public class writePlayers implements CommandExecutor {
                     fileWriter.close();
                 }
             }
-            fileWriter.write(result);
-            fileWriter.flush();
-            fileWriter.close();
         } catch (IOException exception) {
             log.info("An IOException has occured during the writing of the players file");
         }
