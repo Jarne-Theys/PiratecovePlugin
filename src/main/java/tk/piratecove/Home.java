@@ -1,4 +1,4 @@
-package tk.piratecove.GetServerInfo;
+package tk.piratecove;
 
 import org.bukkit.*;
 import org.bukkit.command.Command;

@@ -1,4 +1,4 @@
-package tk.piratecove.GetServerInfo;
+package tk.piratecove;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -10,10 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -27,12 +24,11 @@ import static org.bukkit.event.player.PlayerBedEnterEvent.BedEnterResult.OK;
 public class GetServerInfo extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
-        getLogger().info("GetServerInfo has been enabled");
         this.getCommand("writePLayers").setExecutor(new WritePlayers());
-        this.getCommand("Explode").setExecutor(new Explode());
-        this.getCommand("IsSlimeChunk").setExecutor(new IsSlimeChunk());
-        this.getCommand("Home").setExecutor(new Home());
-        this.getCommand("Smite").setExecutor(new Smite());
+        this.getCommand("explode").setExecutor(new Explode());
+        this.getCommand("isSlimeChunk").setExecutor(new IsSlimeChunk());
+        this.getCommand("home").setExecutor(new Home());
+        this.getCommand("smite").setExecutor(new Smite());
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -51,6 +47,7 @@ public class GetServerInfo extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        getLogger().info("I died");
     }
 
     private void writePlayers() {
@@ -86,13 +83,12 @@ public class GetServerInfo extends JavaPlugin implements Listener {
         Collection<? extends Player> players = Bukkit.getServer().getOnlinePlayers();
         for (Object player : players) {
             if (player instanceof Player) {
-                Player player1 = (Player) player;
                 World world = event.getPlayer().getWorld();
                 Player requestingPlayer = event.getPlayer();
                 PlayerBedEnterEvent.BedEnterResult bedEnterResult = event.getBedEnterResult();
                 boolean isNight = (world.getTime() >= 12516);
 
-                if (isNight && (bedEnterResult == OK || bedEnterResult == NOT_SAFE)) {
+                if (isNight && bedEnterResult == OK) {
                     Bukkit.broadcastMessage(ChatColor.GOLD + requestingPlayer.getName() + " has skipped the night");
                     Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "time set 0");
                     Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),"weather clear");
