@@ -1,6 +1,8 @@
 tk\piratecove\IsSlimeChunk.class
-tk\piratecove\GetServerInfo.class
+tk\piratecove\PiratecovePlugin.class
 tk\piratecove\Home.class
 tk\piratecove\Explode.class
 tk\piratecove\WritePlayers.class
+tk\piratecove\EventListener.class
+tk\piratecove\PiratecovePlugin$1.class
 tk\piratecove\Smite.class

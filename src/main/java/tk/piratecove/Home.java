@@ -11,18 +11,12 @@ public class Home implements CommandExecutor {
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if(commandSender instanceof Player){
             Player sender = (Player) commandSender;
-            World overworld = Bukkit.getServer().getWorlds().get(0);
-            World world = sender.getWorld();
-            if(overworld==world){
-                Location spawnlocation = sender.getBedSpawnLocation();
-                if(spawnlocation!=null){
-                    sender.teleport(spawnlocation);
+            Location targetLocation = sender.getBedSpawnLocation();
+                if(targetLocation!=null){
+                    sender.teleport(targetLocation);
                 } else {
                     sender.sendMessage(ChatColor.GOLD + "You don't have a bed spawn location!");
                 }
-            } else {
-                sender.sendMessage(ChatColor.GOLD + "You can only use this command in the overworld!");
-            }
             return true;
         }
         return false;

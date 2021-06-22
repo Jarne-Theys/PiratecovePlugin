@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>tk.piratecove</groupId>
-    <artifactId>GetServerInfo</artifactId>
-    <version>1.3</version>
+    <artifactId>PiratecovePlugin</artifactId>
+    <version>1.4</version>
 
     <properties>
         <maven.compiler.source>15</maven.compiler.source>
@@ -21,6 +21,10 @@
         <repository>
             <id>papermc</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>Scarsz-Nexus</id>
+            <url>https://nexus.scarsz.me/content/groups/public/</url>
         </repository>
     </repositories>
 
@@ -37,7 +41,6 @@
             <version>1.16.5-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-
     </dependencies>
 
 </project>

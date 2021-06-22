@@ -1,6 +1,6 @@
-name: GetServerInfo
-version: 1.3
-main: tk.piratecove.GetServerInfo
+name: PiratecovePlugin
+version: 1.4
+main: tk.piratecove.PiratecovePlugin
 load: STARTUP
 author: CaptainCapsize
 description: Not a troll
