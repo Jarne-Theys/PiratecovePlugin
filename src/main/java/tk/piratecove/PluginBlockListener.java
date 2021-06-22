@@ -34,7 +34,7 @@ public class PluginBlockListener implements Listener {
 
     @EventHandler
     public void onBlockBreak (BlockBreakEvent event) {
-        if(logs.contains(event.getBlock().getType()) && event.getPlayer().getInventory().getItemInMainHand().getType().name().toLowerCase().contains("axe") && !event.getPlayer().getItemInHand().getType().name().toLowerCase().contains("pickaxe")) {
+        if(logs.contains(event.getBlock().getType()) && event.getPlayer().getInventory().getItemInMainHand().getType().name().toLowerCase().contains("axe") && !event.getPlayer().getInventory().getItemInMainHand().getType().name().toLowerCase().contains("pickaxe")) {
 
             Player player = event.getPlayer();
             ItemStack handItem = player.getInventory().getItemInMainHand();
@@ -59,7 +59,7 @@ public class PluginBlockListener implements Listener {
                 Location blockBelow = new Location(world, x, y-1, z);
                 Material blockBelowType = blockBelow.getBlock().getType();
 
-                if(!blockBelowType.equals(Material.LOG)) {
+                if(!logs.contains(blockBelowType)) {
                     ground = true;
                 }
             }
@@ -73,8 +73,7 @@ public class PluginBlockListener implements Listener {
 
                 Location blockAbove = new Location(world, x, y, z);
                 Material blockAboveType = blockAbove.getBlock().getType();
-
-                if(blockAboveType.equals(Material.LOG)) {
+                if(logs.contains(blockAboveType)) {
                     if(!player.getGameMode().equals(GameMode.CREATIVE)) {
                         blockAbove.getBlock().breakNaturally();
                     } else {
