@@ -13,10 +13,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 
 public class PluginBlockListener implements Listener {
 
-    ArrayList<Material> logs = new ArrayList<Material>(){{
+    ArrayList<Material> logs = new ArrayList<>() {{
         add(Material.ACACIA_LOG);
         add(Material.BIRCH_LOG);
         add(Material.JUNGLE_LOG);
@@ -25,6 +26,15 @@ public class PluginBlockListener implements Listener {
         add(Material.DARK_OAK_LOG);
         add(Material.CRIMSON_STEM);
         add(Material.WARPED_STEM);
+    }};
+
+    ArrayList<Material> leaves = new ArrayList<>() {{
+        add(Material.ACACIA_LEAVES);
+        add(Material.BIRCH_LEAVES);
+        add(Material.JUNGLE_LEAVES);
+        add(Material.OAK_LEAVES);
+        add(Material.DARK_OAK_LEAVES);
+        add(Material.SPRUCE_LEAVES);
     }};
 
     public static PiratecovePlugin plugin;
@@ -46,8 +56,6 @@ public class PluginBlockListener implements Listener {
             double y = blockLocation.getBlockY();
             double y2 = blockLocation.getBlockY();
             double z = blockLocation.getBlockZ();
-
-            byte treeType = new Location(world, x, y+1, z).getBlock().getData();
 
             int height = 0;
 
@@ -74,26 +82,21 @@ public class PluginBlockListener implements Listener {
                 Location blockAbove = new Location(world, x, y, z);
                 Material blockAboveType = blockAbove.getBlock().getType();
                 if(logs.contains(blockAboveType)) {
-                    if(!player.getGameMode().equals(GameMode.CREATIVE)) {
+                    if(player.getGameMode().equals(GameMode.SURVIVAL)) {
                         blockAbove.getBlock().breakNaturally();
-                    } else {
-                        blockAbove.getBlock().setType(Material.AIR);
-                    }
 
-                    if(conf.getBoolean("damageAxe") && !player.getGameMode().equals(GameMode.CREATIVE)) {
                         int enchLvl = handItem.getEnchantmentLevel(Enchantment.DURABILITY);
                         long random = Math.round((Math.random()*enchLvl));
 
-                        if(random == 0) {
-                            if(handItem.getType().getMaxDurability() > handItem.getDurability()) {
-                                handItem.setItemMeta()
-                                handItem.setDurability((short) (handItem.getDurability() + 1));
-                            }
+                        if(random != 0) {
+                           Damageable damageableHandItem = (Damageable) handItem.getItemMeta();
+                           int currentDamage = damageableHandItem.getDamage();
+                           damageableHandItem.setDamage(currentDamage + 1);
                         }
                     }
 
                     logsLeft = true;
-                } else if(blockAboveType.equals(Material.LEAVES)) {
+                } else if(leaves.contains(blockAboveType)) {
                     logsLeft = false;
                     isTree = true;
                 } else {
@@ -101,6 +104,12 @@ public class PluginBlockListener implements Listener {
                     isTree = false;
                 }
             }
+
+
+
+            //TODO BELOW
+
+
 
             //If the broken stem is a tree, the following will be executed
             if (isTree) {
@@ -114,17 +123,7 @@ public class PluginBlockListener implements Listener {
                             Location surround = new Location(world, x + xCount, y2 + yCount, z + zCount);
                             Material surroundType = surround.getBlock().getType();
 
-                            if(conf.getBoolean("breakLeaves")) {
-                                if(surroundType == Material.LEAVES) {
-                                    if(!player.getGameMode().equals(GameMode.CREATIVE)) {
-                                        surround.getBlock().breakNaturally();
-                                    } else {
-                                        surround.getBlock().setType(Material.AIR);
-                                    }
-                                }
-                            }
-
-                            if(surroundType == Material.LOG) {
+                            if(logs.contains(surroundType)) {
 
                                 if(!player.getGameMode().equals(GameMode.CREATIVE)) {
                                     surround.getBlock().breakNaturally();
@@ -149,11 +148,6 @@ public class PluginBlockListener implements Listener {
                                         }
                                     }
                                 }
-
-                                if(conf.getBoolean("auto-replant") && (new Location(world, surround.getBlockX(), surround.getBlockY()-1, surround.getBlockZ()).getBlock().getType().equals(Material.GRASS) || new Location(world, surround.getBlockX(), surround.getBlockY()-1, surround.getBlockZ()).getBlock().getType().equals(Material.DIRT))) {
-                                    surround.getBlock().setType(Material.SAPLING);
-                                    surround.getBlock().setData(treeType);
-                                }
                             }
                         }
                     }
@@ -168,7 +162,7 @@ public class PluginBlockListener implements Listener {
                                 Material surroundType = surround.getBlock().getType();
 
                                 if(conf.getBoolean("breakLeaves")) {
-                                    if(surroundType == Material.LEAVES) {
+                                    if(leaves.contains(surroundType)) {
                                         if(!player.getGameMode().equals(GameMode.CREATIVE)) {
                                             surround.getBlock().breakNaturally();
                                         } else {
@@ -177,7 +171,7 @@ public class PluginBlockListener implements Listener {
                                     }
                                 }
 
-                                if(surroundType == Material.LOG) {
+                                if(logs.contains(surroundType)) {
 
                                     if(!player.getGameMode().equals(GameMode.CREATIVE)) {
                                         surround.getBlock().breakNaturally();
@@ -216,7 +210,7 @@ public class PluginBlockListener implements Listener {
                                 Material surroundType = surround.getBlock().getType();
 
                                 if(conf.getBoolean("breakLeaves")) {
-                                    if(surroundType == Material.LEAVES) {
+                                    if(leaves.contains(surroundType)) {
                                         if(!player.getGameMode().equals(GameMode.CREATIVE)) {
                                             surround.getBlock().breakNaturally();
                                         } else {
@@ -225,7 +219,7 @@ public class PluginBlockListener implements Listener {
                                     }
                                 }
 
-                                if(surroundType == Material.LOG) {
+                                if(logs.contains(surroundType)) {
 
                                     if(!player.getGameMode().equals(GameMode.CREATIVE)) {
                                         surround.getBlock().breakNaturally();

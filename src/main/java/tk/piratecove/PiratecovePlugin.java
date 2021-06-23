@@ -11,6 +11,7 @@ import java.util.*;
 public class PiratecovePlugin extends JavaPlugin{
 
     public final PluginBlockListener blockListener = new PluginBlockListener(this);
+    public static boolean initialised = false;
 
 
     static Map<String, Long> tpaCooldown = new HashMap<String, Long>();
