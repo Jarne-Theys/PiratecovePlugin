@@ -107,7 +107,7 @@ public class PluginBlockListener implements Listener {
 
 
 
-            //TODO BELOW
+            //DO BELOW
 
 
 
@@ -123,32 +123,7 @@ public class PluginBlockListener implements Listener {
                             Location surround = new Location(world, x + xCount, y2 + yCount, z + zCount);
                             Material surroundType = surround.getBlock().getType();
 
-                            if(logs.contains(surroundType)) {
-
-                                if(!player.getGameMode().equals(GameMode.CREATIVE)) {
-                                    surround.getBlock().breakNaturally();
-                                } else {
-                                    surround.getBlock().setType(Material.AIR);
-                                }
-
-
-                                if(conf.getBoolean("playSmokeEffect")) {
-                                    player.getWorld().playEffect(surround, Effect.SMOKE, 4);
-                                }
-
-                                if(conf.getBoolean("damageAxe") && !player.getGameMode().equals(GameMode.CREATIVE)) {
-                                    int enchLvl = handItem.getEnchantmentLevel(Enchantment.DURABILITY);
-                                    long random = Math.round((Math.random()*enchLvl));
-
-                                    if(random == 0) {
-                                        if(handItem.getType().getMaxDurability() > handItem.getDurability()) {
-                                            handItem.setDurability((short) (handItem.getDurability() + 1));
-                                        } else if(handItem.getDurability() == handItem.getType().getMaxDurability()) {
-                                            player.getInventory().setItemInHand(null);
-                                        }
-                                    }
-                                }
-                            }
+                            bigTreeRemoval(player, handItem, surround, surroundType);
                         }
                     }
                 }
@@ -161,41 +136,7 @@ public class PluginBlockListener implements Listener {
                                 Location surround = new Location(world, x + xCount, y2 + height + yCount, z + zCount);
                                 Material surroundType = surround.getBlock().getType();
 
-                                if(conf.getBoolean("breakLeaves")) {
-                                    if(leaves.contains(surroundType)) {
-                                        if(!player.getGameMode().equals(GameMode.CREATIVE)) {
-                                            surround.getBlock().breakNaturally();
-                                        } else {
-                                            surround.getBlock().setType(Material.AIR);
-                                        }
-                                    }
-                                }
-
-                                if(logs.contains(surroundType)) {
-
-                                    if(!player.getGameMode().equals(GameMode.CREATIVE)) {
-                                        surround.getBlock().breakNaturally();
-                                    } else {
-                                        surround.getBlock().setType(Material.AIR);
-                                    }
-
-                                    if(conf.getBoolean("playSmokeEffect")) {
-                                        player.getWorld().playEffect(surround, Effect.SMOKE, 4);
-                                    }
-
-                                    if(conf.getBoolean("damageAxe") && !player.getGameMode().equals(GameMode.CREATIVE)) {
-                                        int enchLvl = handItem.getEnchantmentLevel(Enchantment.DURABILITY);
-                                        long random = Math.round((Math.random()*enchLvl));
-
-                                        if(random == 0) {
-                                            if(handItem.getType().getMaxDurability() > handItem.getDurability()) {
-                                                handItem.setDurability((short) (handItem.getDurability() + 1));
-                                            } else if(handItem.getDurability() == handItem.getType().getMaxDurability()) {
-                                                player.getInventory().setItemInHand(null);
-                                            }
-                                        }
-                                    }
-                                }
+                                bigTreeRemoval(player, handItem,surround, surroundType);
                             }
                         }
                     }
@@ -211,41 +152,39 @@ public class PluginBlockListener implements Listener {
 
                                 if(conf.getBoolean("breakLeaves")) {
                                     if(leaves.contains(surroundType)) {
-                                        if(!player.getGameMode().equals(GameMode.CREATIVE)) {
+                                        if(player.getGameMode().equals(GameMode.SURVIVAL)) {
                                             surround.getBlock().breakNaturally();
-                                        } else {
-                                            surround.getBlock().setType(Material.AIR);
                                         }
                                     }
                                 }
 
-                                if(logs.contains(surroundType)) {
-
-                                    if(!player.getGameMode().equals(GameMode.CREATIVE)) {
-                                        surround.getBlock().breakNaturally();
-                                    } else {
-                                        surround.getBlock().setType(Material.AIR);
-                                    }
-
-                                    if(conf.getBoolean("playSmokeEffect")) {
-                                        player.getWorld().playEffect(surround, Effect.SMOKE, 4);
-                                    }
-
-                                    if(conf.getBoolean("damageAxe") && !player.getGameMode().equals(GameMode.CREATIVE)) {
-                                        int enchLvl = handItem.getEnchantmentLevel(Enchantment.DURABILITY);
-                                        long random = Math.round((Math.random()*enchLvl));
-
-                                        if(random == 0) {
-                                            if(handItem.getType().getMaxDurability() > handItem.getDurability()) {
-                                                handItem.setDurability((short) (handItem.getDurability() + 1));
-                                            } else if(handItem.getDurability() == handItem.getType().getMaxDurability()) {
-                                                player.getInventory().setItemInHand(null);
-                                            }
-                                        }
-                                    }
-                                }
+                                bigTreeRemoval(player, handItem, surround, surroundType);
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    private void bigTreeRemoval(Player player, ItemStack handItem, Location surround, Material surroundType) {
+        if(logs.contains(surroundType)) {
+
+            if(!player.getGameMode().equals(GameMode.CREATIVE)) {
+                surround.getBlock().breakNaturally();
+            } else {
+                surround.getBlock().setType(Material.AIR);
+            }
+
+            if(player.getGameMode().equals(GameMode.SURVIVAL)) {
+                int enchLvl = handItem.getEnchantmentLevel(Enchantment.DURABILITY);
+                long random = Math.round((Math.random()*enchLvl));
+
+                if(random == 0) {
+                    if(handItem.getType().getMaxDurability() > handItem.getDurability()) {
+                        handItem.setDurability((short) (handItem.getDurability() + 1));
+                    } else if(handItem.getDurability() == handItem.getType().getMaxDurability()) {
+                        player.getInventory().setItemInHand(null);
                     }
                 }
             }

@@ -1,9 +1,6 @@
 package tk.piratecove;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -42,20 +39,22 @@ public class EventListener implements Listener {
             thread.start();
         }
     }
-
+/*
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
         if(!initialised){
+            World world = Bukkit.getServer().getWorlds().get(0);
             Bukkit.getServer().getLogger().info("Player spawn locations not force loaded yet!");
             Bukkit.getServer().getLogger().info("Force loading CaptainCapsize farms...");
             LinkedList<Chunk> forceLoadChunks = new LinkedList();
-            Chunk AythrixBed = new Location(Bukkit.getServer().getWorlds().get(0), 72.000, 64.000, -97.000).getChunk();
-            Chunk CapsizeBed = new Location(Bukkit.getServer().getWorlds().get(0), -595.000, 84.000, 210.000).getChunk();
-            Chunk CapsizeIronFarm1 = new Location(Bukkit.getServer().getWorlds().get(0), -546.000, 79.000, -204.000).getChunk();
-            Chunk CapsizeIronFarm2 = new Location(Bukkit.getServer().getWorlds().get(0), -540.000, 79.000, -204.000).getChunk();
-            Chunk CapsizeSugarFarm1 = new Location(Bukkit.getServer().getWorlds().get(0), -554.405, 78.000, 244.000).getChunk();
-            Chunk CapsizeSugarFarm2 = new Location(Bukkit.getServer().getWorlds().get(0), -567.000, 75.000, 244.000).getChunk();
-            Chunk CapsizeSheepFarm = new Location(Bukkit.getServer().getWorlds().get(0), -581.000, 79.000, 246.000).getChunk();
+            Chunk AythrixBed = new Location(world, 72.000, 64.000, -97.000).getChunk();
+            Chunk CapsizeBed = new Location(world, -595.000, 84.000, 210.000).getChunk();
+            Chunk CapsizeIronFarm1 = new Location(world, -546.000, 79.000, -204.000).getChunk();
+            Chunk CapsizeIronFarm2 = new Location(world, -540.000, 79.000, -204.000).getChunk();
+            Chunk CapsizeSugarFarm1 = new Location(world, -554.405, 78.000, 244.000).getChunk();
+            Chunk CapsizeSugarFarm2 = new Location(world, -567.000, 75.000, 244.000).getChunk();
+            Chunk CapsizeSheepFarm = new Location(world, -581.000, 79.000, 246.000).getChunk();
+            Chunk CapsizeNetherWartFarm = new Location(world,-573.000,77.000,217.000).getChunk();
             forceLoadChunks.add(AythrixBed);
             forceLoadChunks.add(CapsizeBed);
             forceLoadChunks.add(CapsizeIronFarm1);
@@ -63,6 +62,7 @@ public class EventListener implements Listener {
             forceLoadChunks.add(CapsizeSugarFarm1);
             forceLoadChunks.add(CapsizeSugarFarm2);
             forceLoadChunks.add(CapsizeSheepFarm);
+            forceLoadChunks.add(CapsizeNetherWartFarm);
             for (Chunk chunk : forceLoadChunks) {
                 if(!chunk.isForceLoaded()){
                     chunk.setForceLoaded(true);
@@ -72,4 +72,5 @@ public class EventListener implements Listener {
             }
         }
     }
+    */
 }
