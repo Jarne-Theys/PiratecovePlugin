@@ -1,12 +1,9 @@
 package tk.piratecove;
 
-import java.util.ArrayList;
-import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,6 +11,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
+
+import java.util.ArrayList;
 
 public class PluginBlockListener implements Listener {
 
@@ -37,18 +36,12 @@ public class PluginBlockListener implements Listener {
         add(Material.SPRUCE_LEAVES);
     }};
 
-    public static PiratecovePlugin plugin;
-    public PluginBlockListener(PiratecovePlugin instance) {
-        plugin = instance;
-    }
-
     @EventHandler
     public void onBlockBreak (BlockBreakEvent event) {
         if(logs.contains(event.getBlock().getType()) && event.getPlayer().getInventory().getItemInMainHand().getType().name().toLowerCase().contains("axe") && !event.getPlayer().getInventory().getItemInMainHand().getType().name().toLowerCase().contains("pickaxe")) {
 
             Player player = event.getPlayer();
             ItemStack handItem = player.getInventory().getItemInMainHand();
-            FileConfiguration conf = plugin.getConfig();
             World world = player.getWorld();
             Location blockLocation = event.getBlock().getLocation();
 
@@ -82,18 +75,7 @@ public class PluginBlockListener implements Listener {
                 Location blockAbove = new Location(world, x, y, z);
                 Material blockAboveType = blockAbove.getBlock().getType();
                 if(logs.contains(blockAboveType)) {
-                    if(player.getGameMode().equals(GameMode.SURVIVAL)) {
-                        blockAbove.getBlock().breakNaturally();
-
-                        int enchLvl = handItem.getEnchantmentLevel(Enchantment.DURABILITY);
-                        long random = Math.round((Math.random()*enchLvl));
-
-                        if(random != 0) {
-                           Damageable damageableHandItem = (Damageable) handItem.getItemMeta();
-                           int currentDamage = damageableHandItem.getDamage();
-                           damageableHandItem.setDamage(currentDamage + 1);
-                        }
-                    }
+                    breakBlockAndRemoveDurability(player, handItem, blockAbove);
 
                     logsLeft = true;
                 } else if(leaves.contains(blockAboveType)) {
@@ -104,12 +86,6 @@ public class PluginBlockListener implements Listener {
                     isTree = false;
                 }
             }
-
-
-
-            //DO BELOW
-
-
 
             //If the broken stem is a tree, the following will be executed
             if (isTree) {
@@ -122,7 +98,6 @@ public class PluginBlockListener implements Listener {
 
                             Location surround = new Location(world, x + xCount, y2 + yCount, z + zCount);
                             Material surroundType = surround.getBlock().getType();
-
                             bigTreeRemoval(player, handItem, surround, surroundType);
                         }
                     }
@@ -135,7 +110,6 @@ public class PluginBlockListener implements Listener {
                             for(int zCount = -5; zCount <= 5; zCount++) {
                                 Location surround = new Location(world, x + xCount, y2 + height + yCount, z + zCount);
                                 Material surroundType = surround.getBlock().getType();
-
                                 bigTreeRemoval(player, handItem,surround, surroundType);
                             }
                         }
@@ -149,15 +123,6 @@ public class PluginBlockListener implements Listener {
                             for(int zCount = -5; zCount < 6; zCount++) {
                                 Location surround = new Location(world, x + xCount, y2 + height + yCount, z + zCount);
                                 Material surroundType = surround.getBlock().getType();
-
-                                if(conf.getBoolean("breakLeaves")) {
-                                    if(leaves.contains(surroundType)) {
-                                        if(player.getGameMode().equals(GameMode.SURVIVAL)) {
-                                            surround.getBlock().breakNaturally();
-                                        }
-                                    }
-                                }
-
                                 bigTreeRemoval(player, handItem, surround, surroundType);
                             }
                         }
@@ -169,24 +134,19 @@ public class PluginBlockListener implements Listener {
 
     private void bigTreeRemoval(Player player, ItemStack handItem, Location surround, Material surroundType) {
         if(logs.contains(surroundType)) {
+            breakBlockAndRemoveDurability(player, handItem, surround);
+        }
+    }
 
-            if(!player.getGameMode().equals(GameMode.CREATIVE)) {
-                surround.getBlock().breakNaturally();
-            } else {
-                surround.getBlock().setType(Material.AIR);
-            }
-
-            if(player.getGameMode().equals(GameMode.SURVIVAL)) {
-                int enchLvl = handItem.getEnchantmentLevel(Enchantment.DURABILITY);
-                long random = Math.round((Math.random()*enchLvl));
-
-                if(random == 0) {
-                    if(handItem.getType().getMaxDurability() > handItem.getDurability()) {
-                        handItem.setDurability((short) (handItem.getDurability() + 1));
-                    } else if(handItem.getDurability() == handItem.getType().getMaxDurability()) {
-                        player.getInventory().setItemInHand(null);
-                    }
-                }
+    private void breakBlockAndRemoveDurability(Player player, ItemStack handItem, Location surround) {
+        if(player.getGameMode().equals(GameMode.SURVIVAL)) {
+            surround.getBlock().breakNaturally();
+            int enchLvl = handItem.getEnchantmentLevel(Enchantment.DURABILITY);
+            long random = Math.round((Math.random()*enchLvl));
+            if(random == 0) {
+                Damageable damageableHandItem = (Damageable) handItem.getItemMeta();
+                int currentDamage = damageableHandItem.getDamage();
+                damageableHandItem.setDamage(currentDamage + 1);
             }
         }
     }

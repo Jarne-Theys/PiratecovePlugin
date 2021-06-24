@@ -1,19 +1,58 @@
 package tk.piratecove;
 
+
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-import java.util.*;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+//import org.json.JSONObject;
+//import org.junit.jupiter.api.Test;
+
 
 public class PiratecovePlugin extends JavaPlugin{
 
-    public final PluginBlockListener blockListener = new PluginBlockListener(this);
     public static boolean initialised = false;
 
+    public Map<String,Map<String,String>> customAchievements = getCustomAchievements();
+    ArrayList<String> achievementNames = new ArrayList<>(){{
+        /*
+        -----Player events-----
+        Mob kill counter
+        Block break counter
+        Egg throw counter
+        Portal uses
+        Death counter
+        Raid counter
+        Stick bonk - one time
+
+        Death counter (entity event)
+
+        -----Entity events-----
+        Breeding counter
+        Tame counter
+
+        -----World events-----
+        Remove rain on weather chance, UNLESS player has riptide trident in inventory
+
+        -----Website-----
+        World - Coordinaten
+        Dynmap?
+         */
+    }};
 
     static Map<String, Long> tpaCooldown = new HashMap<String, Long>();
     static Map<String, String> currentRequest = new HashMap<String, String>();
@@ -31,6 +70,57 @@ public class PiratecovePlugin extends JavaPlugin{
 
 
         getServer().getPluginManager().registerEvents(new EventListener(),this);
+        getServer().getPluginManager().registerEvents(new PluginBlockListener(),this);
+
+
+
+
+        getLogger().info("Enabled PiratecovePlugin");
+    }
+
+    public Map<String,Map<String,String>> getCustomAchievements(){
+        OfflinePlayer[] allPlayers = Bukkit.getServer().getOfflinePlayers();
+        Map<String, Map<String, String>> result = new HashMap<>();
+        Map<String,String> newAchievements = new HashMap<>();
+        String currentPlayer;
+        String currentAchievementKey;
+        String currentAchievementValue;
+        try {
+            Object object = new JSONParser().parse(new FileReader("C:\\MCServerFiles\\achievements.json"));
+            JSONObject jo = (JSONObject) object;
+            for (Object string : jo.keySet()) {
+                Map Fileachievements = (Map) jo.get(string);
+                Iterator<Map.Entry> itr1 = Fileachievements.entrySet().iterator();
+                currentPlayer=(String)string;
+                while (itr1.hasNext()) {
+                    var pair = itr1.next();
+                    currentAchievementKey = (String)pair.getKey();
+                    currentAchievementValue = (String) pair.getValue();
+                    Map<String,String> achievement = new HashMap<>();
+                    newAchievements.put(currentAchievementKey,currentAchievementValue);
+                }
+                result.put(currentPlayer,newAchievements);
+            }
+            for(OfflinePlayer player : allPlayers){
+                if(!result.containsKey(player.getName())){
+                    //take value from achievementnames
+                    //put in new map, set value to 0
+                    //return
+                }
+            }
+        }
+        catch(FileNotFoundException exception){
+            getLogger().info("Initialise custom achievements failed: File not found");
+            Bukkit.getServer().broadcastMessage(ChatColor.MAGIC + "Custom achievements" + ChatColor.RED + " have been disabled");
+        }
+        catch(IOException exception){
+            getLogger().info("Initialise custom achievements failed: An IOException has occured");
+            Bukkit.getServer().broadcastMessage(ChatColor.MAGIC + "Custom achievements" + ChatColor.RED + " have been disabled");
+        } catch (ParseException e) {
+            getLogger().info("Initialise custom achievements failed: A ParseException has occured");
+            Bukkit.getServer().broadcastMessage(ChatColor.MAGIC + "Custom achievements" + ChatColor.RED + " have been disabled");
+        }
+        return result;
     }
 
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String commandLabel, String[] args) {
@@ -166,7 +256,8 @@ public class PiratecovePlugin extends JavaPlugin{
 
     @Override
     public void onDisable() {
-        getLogger().info("I died");
+        getLogger().info("Disabled PiratecovePlugin");
+        Bukkit.getServer().broadcastMessage(ChatColor.RED + "The custom PiratecovePlugin has been disabled due to an error. Features like night skipping, /home and " + ChatColor.MAGIC + "custom achievements" + ChatColor.RED + " will not work.");
     }
 
 
