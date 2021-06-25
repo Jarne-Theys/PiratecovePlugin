@@ -4,6 +4,7 @@ main: tk.piratecove.PiratecovePlugin
 load: STARTUP
 author: CaptainCapsize
 description: Not a troll
+api-version: 1.16
 
 commands:
   writePlayers:
@@ -27,4 +28,13 @@ commands:
   tpa:
     description: Send a teleport request to a player, which they can accept or refuse
     usage: /<command> player
+  tpaccept:
+    description: Accepts a teleport request
+    usage: /<comand>
+  tpdeny:
+    description: Declines a teleport request
+    usage: /<command>
+  sunny:
+    description: Makes the rain go away
+    usage: /<command>
 
