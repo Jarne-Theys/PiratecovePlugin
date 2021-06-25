@@ -6,7 +6,7 @@
 
     <groupId>tk.piratecove</groupId>
     <artifactId>PiratecovePlugin</artifactId>
-    <version>1.5</version>
+    <version>1.5.2</version>
 
     <properties>
         <maven.compiler.source>15</maven.compiler.source>

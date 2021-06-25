@@ -16,7 +16,7 @@ public class Explode implements CommandExecutor {
         Player targetPlayer = Bukkit.getPlayer(args[0]);
         assert targetPlayer != null;
         Location location = targetPlayer.getLocation();
-        world.playSound(location, Sound.ENTITY_CREEPER_PRIMED,2,1);
+        world.playSound(location, Sound.ENTITY_CREEPER_PRIMED, 2, 1);
         return true;
     }
 }

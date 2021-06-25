@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 public class IsSlimeChunk implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-        if (!(commandSender instanceof Player)){
+        if (!(commandSender instanceof Player)) {
             return false;
         }
         Player sender = (Player) commandSender;

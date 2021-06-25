@@ -12,9 +12,9 @@ public class Smite implements CommandExecutor {
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         Location location = Bukkit.getPlayer(strings[0]).getLocation();
         World world = Bukkit.getWorlds().get(0);
-        if(strings.length==2){
+        if (strings.length == 2) {
             world.strikeLightning(location);
-        }else{
+        } else {
             world.strikeLightningEffect(location);
         }
         return true;

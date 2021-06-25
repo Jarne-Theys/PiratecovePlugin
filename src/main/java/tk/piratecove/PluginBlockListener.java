@@ -37,8 +37,8 @@ public class PluginBlockListener implements Listener {
     }};
 
     @EventHandler
-    public void onBlockBreak (BlockBreakEvent event) {
-        if(logs.contains(event.getBlock().getType()) && event.getPlayer().getInventory().getItemInMainHand().getType().name().toLowerCase().contains("axe") && !event.getPlayer().getInventory().getItemInMainHand().getType().name().toLowerCase().contains("pickaxe")) {
+    public void onBlockBreak(BlockBreakEvent event) {
+        if (logs.contains(event.getBlock().getType()) && event.getPlayer().getInventory().getItemInMainHand().getType().name().toLowerCase().contains("axe") && !event.getPlayer().getInventory().getItemInMainHand().getType().name().toLowerCase().contains("pickaxe")) {
 
             Player player = event.getPlayer();
             ItemStack handItem = player.getInventory().getItemInMainHand();
@@ -54,13 +54,13 @@ public class PluginBlockListener implements Listener {
 
             boolean ground = false;
 
-            while(!ground) {
+            while (!ground) {
                 y--;
                 y2--;
-                Location blockBelow = new Location(world, x, y-1, z);
+                Location blockBelow = new Location(world, x, y - 1, z);
                 Material blockBelowType = blockBelow.getBlock().getType();
 
-                if(!logs.contains(blockBelowType)) {
+                if (!logs.contains(blockBelowType)) {
                     ground = true;
                 }
             }
@@ -68,17 +68,17 @@ public class PluginBlockListener implements Listener {
             boolean logsLeft = true;
             boolean isTree = false;
 
-            while(logsLeft) {
+            while (logsLeft) {
                 y++;
                 height++;
 
                 Location blockAbove = new Location(world, x, y, z);
                 Material blockAboveType = blockAbove.getBlock().getType();
-                if(logs.contains(blockAboveType)) {
+                if (logs.contains(blockAboveType)) {
                     breakBlockAndRemoveDurability(player, handItem, blockAbove);
 
                     logsLeft = true;
-                } else if(leaves.contains(blockAboveType)) {
+                } else if (leaves.contains(blockAboveType)) {
                     logsLeft = false;
                     isTree = true;
                 } else {
@@ -92,9 +92,9 @@ public class PluginBlockListener implements Listener {
                 event.setCancelled(true);
 
                 //SYSTEM FOR SMALL TREE REMOVAL
-                for(int xCount = -2; xCount <= 2; xCount++) {
-                    for(int yCount = 0; yCount <= height + 2; yCount++) {
-                        for(int zCount = -2; zCount <= 2; zCount++) {
+                for (int xCount = -2; xCount <= 2; xCount++) {
+                    for (int yCount = 0; yCount <= height + 2; yCount++) {
+                        for (int zCount = -2; zCount <= 2; zCount++) {
 
                             Location surround = new Location(world, x + xCount, y2 + yCount, z + zCount);
                             Material surroundType = surround.getBlock().getType();
@@ -105,22 +105,22 @@ public class PluginBlockListener implements Listener {
 
                 //SYSTEM FOR BIG TREE REMOVAL
                 if (height >= 8 && height <= 13) {
-                    for(int xCount = -5; xCount <= 5; xCount++) {
-                        for(int yCount = -7; yCount <= 5; yCount++) {
-                            for(int zCount = -5; zCount <= 5; zCount++) {
+                    for (int xCount = -5; xCount <= 5; xCount++) {
+                        for (int yCount = -7; yCount <= 5; yCount++) {
+                            for (int zCount = -5; zCount <= 5; zCount++) {
                                 Location surround = new Location(world, x + xCount, y2 + height + yCount, z + zCount);
                                 Material surroundType = surround.getBlock().getType();
-                                bigTreeRemoval(player, handItem,surround, surroundType);
+                                bigTreeRemoval(player, handItem, surround, surroundType);
                             }
                         }
                     }
                 }
 
                 //SYSTEM FOR BIG JUNGLE TREE REMOVAL
-                if(height > 13) {
-                    for(int xCount = -5; xCount <= 5; xCount++) {
-                        for(int yCount = -(height-5); yCount <= 5; yCount++) {
-                            for(int zCount = -5; zCount < 6; zCount++) {
+                if (height > 13) {
+                    for (int xCount = -5; xCount <= 5; xCount++) {
+                        for (int yCount = -(height - 5); yCount <= 5; yCount++) {
+                            for (int zCount = -5; zCount < 6; zCount++) {
                                 Location surround = new Location(world, x + xCount, y2 + height + yCount, z + zCount);
                                 Material surroundType = surround.getBlock().getType();
                                 bigTreeRemoval(player, handItem, surround, surroundType);
@@ -133,17 +133,17 @@ public class PluginBlockListener implements Listener {
     }
 
     private void bigTreeRemoval(Player player, ItemStack handItem, Location surround, Material surroundType) {
-        if(logs.contains(surroundType)) {
+        if (logs.contains(surroundType)) {
             breakBlockAndRemoveDurability(player, handItem, surround);
         }
     }
 
     private void breakBlockAndRemoveDurability(Player player, ItemStack handItem, Location surround) {
-        if(player.getGameMode().equals(GameMode.SURVIVAL)) {
+        if (player.getGameMode().equals(GameMode.SURVIVAL)) {
             surround.getBlock().breakNaturally();
             int enchLvl = handItem.getEnchantmentLevel(Enchantment.DURABILITY);
-            long random = Math.round((Math.random()*enchLvl));
-            if(random == 0) {
+            long random = Math.round((Math.random() * enchLvl));
+            if (random == 0) {
                 Damageable damageableHandItem = (Damageable) handItem.getItemMeta();
                 int currentDamage = damageableHandItem.getDamage();
                 damageableHandItem.setDamage(currentDamage + 1);

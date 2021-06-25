@@ -1,7 +1,10 @@
 package tk.piratecove;
 
 
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -11,23 +14,21 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-//import org.json.JSONObject;
-//import org.junit.jupiter.api.Test;
+//TODO READ HOME VALUES FROM FILE ON STARTUP
 
+public class PiratecovePlugin extends JavaPlugin {
+    private Map<String, Map<String, String>> customAchievements;
 
-public class PiratecovePlugin extends JavaPlugin{
-    private Map<String,Map<String,String>> customAchievements;
-
-    ArrayList<String> achievementNames = new ArrayList<>(){{
+    ArrayList<String> achievementNames = new ArrayList<>() {{
         //-----Player events-----
         add("Mob kills");
         add("Blocks broken");
@@ -54,6 +55,8 @@ public class PiratecovePlugin extends JavaPlugin{
     static Map<String, Long> tpaCooldown = new HashMap<String, Long>();
     static Map<String, String> currentRequest = new HashMap<String, String>();
 
+    public static Map<Player, Location> playerHomes = new HashMap<>();
+
     @Override
     public void onEnable() {
         loadConfig();
@@ -61,27 +64,29 @@ public class PiratecovePlugin extends JavaPlugin{
         this.getCommand("writePLayers").setExecutor(new WritePlayers());
         this.getCommand("explode").setExecutor(new Explode());
         this.getCommand("isSlimeChunk").setExecutor(new IsSlimeChunk());
+        this.getCommand("sethome").setExecutor(new Sethome());
         this.getCommand("home").setExecutor(new Home());
         this.getCommand("smite").setExecutor(new Smite());
         this.getCommand("sunny").setExecutor(new Sunny());
-        this.getCommand("tpa").setExecutor(this::onCommand);
-        this.getCommand("tpaccept").setExecutor(this::onCommand);
-        this.getCommand("tpdeny").setExecutor(this::onCommand);
+        this.getCommand("tpa").setExecutor(this);
+        this.getCommand("tpaccept").setExecutor(this);
+        this.getCommand("tpdeny").setExecutor(this);
 
-        getServer().getPluginManager().registerEvents(new EventListener(),this);
-        getServer().getPluginManager().registerEvents(new PluginBlockListener(),this);
-        getServer().getPluginManager().registerEvents(new AchievementHandler(this),this);
+        getServer().getPluginManager().registerEvents(new EventListener(), this);
+        getServer().getPluginManager().registerEvents(new PluginBlockListener(), this);
+        getServer().getPluginManager().registerEvents(new AchievementHandler(this), this);
 
-        if(getConfig().getBoolean("enableCustomAchievements")){
+        if (getConfig().getBoolean("enableCustomAchievements")) {
             customAchievements = setCustomAchievements();
         }
         getLogger().info("Enabled PiratecovePlugin");
     }
 
-    public Map<String,Map<String,String>> setCustomAchievements(){
+    public Map<String, Map<String, String>> setCustomAchievements() {
         OfflinePlayer[] allPlayers = Bukkit.getServer().getOfflinePlayers();
+        Player captain = Bukkit.getServer().getPlayer("OGCaptainCapsize");
         Map<String, Map<String, String>> result = new HashMap<>();
-        Map<String,String> newAchievements = new HashMap<>();
+        Map<String, String> newAchievements = new HashMap<>();
         String currentPlayer;
         String currentAchievementKey;
         String currentAchievementValue;
@@ -91,40 +96,50 @@ public class PiratecovePlugin extends JavaPlugin{
             for (Object string : jo.keySet()) {
                 Map Fileachievements = (Map) jo.get(string);
                 Iterator<Map.Entry> itr1 = Fileachievements.entrySet().iterator();
-                currentPlayer=(String)string;
+                currentPlayer = (String) string;
                 while (itr1.hasNext()) {
                     var pair = itr1.next();
-                    currentAchievementKey = (String)pair.getKey();
+                    currentAchievementKey = (String) pair.getKey();
                     currentAchievementValue = (String) pair.getValue();
-                    newAchievements.put(currentAchievementKey,currentAchievementValue);
+                    newAchievements.put(currentAchievementKey, currentAchievementValue);
                 }
-                for(String achievement : achievementNames){
-                    if(!newAchievements.containsKey(achievement)){
-                        newAchievements.put(achievement,"0");
+                for (String achievement : achievementNames) {
+                    if (!newAchievements.containsKey(achievement)) {
+                        newAchievements.put(achievement, "0");
                     }
                 }
-                result.put(currentPlayer,newAchievements);
+                result.put(currentPlayer, newAchievements);
             }
-            for(OfflinePlayer player : allPlayers){
-                if(!result.containsKey(player.getName())){
-                    Map<String,String> newPlayerAchievements = new HashMap<>();
-                    for(String achievement : achievementNames){
-                        newPlayerAchievements.put(achievement,"0");
+            for (OfflinePlayer player : allPlayers) {
+                if (!result.containsKey(player.getName())) {
+                    Map<String, String> newPlayerAchievements = new HashMap<>();
+                    for (String achievement : achievementNames) {
+                        newPlayerAchievements.put(achievement, "0");
                     }
-                    result.put(player.getName(),newPlayerAchievements);
+                    result.put(player.getName(), newPlayerAchievements);
                 }
             }
-        }
-        catch(FileNotFoundException exception){
+        } catch (FileNotFoundException exception) {
             getLogger().info("Initialise custom achievements failed: File not found");
-            Bukkit.getServer().broadcastMessage(ChatColor.MAGIC + "Custom achievements" + ChatColor.RED + " have been disabled");
-        }
-        catch(IOException exception){
+            if (captain != null) {
+                captain.sendMessage(ChatColor.RED + "Custom achievements have been disabled: FileNotFoundException");
+            } else {
+                Bukkit.getServer().broadcastMessage(ChatColor.RED + "Custom achievements have been disabled due to an error.");
+            }
+        } catch (IOException exception) {
             getLogger().info("Initialise custom achievements failed: An IOException has occured");
-            Bukkit.getServer().broadcastMessage(ChatColor.MAGIC + "Custom achievements" + ChatColor.RED + " have been disabled");
+            if (captain != null) {
+                captain.sendMessage(ChatColor.RED + "Custom achievements have been disabled: IOException");
+            } else {
+                Bukkit.getServer().broadcastMessage(ChatColor.RED + "Custom achievements have been disabled due to an error.");
+            }
         } catch (ParseException e) {
             getLogger().info("Initialise custom achievements failed: A ParseException has occured");
-            Bukkit.getServer().broadcastMessage(ChatColor.MAGIC + "Custom achievements" + ChatColor.RED + " have been disabled");
+            if (captain != null) {
+                captain.sendMessage(ChatColor.RED + "Custom achievements have been disabled: ParseException");
+            } else {
+                Bukkit.getServer().broadcastMessage(ChatColor.RED + "Custom achievements have been disabled due to an error.");
+            }
         }
         return result;
     }
@@ -135,12 +150,12 @@ public class PiratecovePlugin extends JavaPlugin{
 
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String commandLabel, String[] args) {
         //Reload config file
-        if(cmd.getName().equalsIgnoreCase("piratecoveplugin")){
-            if(args.length == 0){
+        if (cmd.getName().equalsIgnoreCase("piratecoveplugin")) {
+            if (args.length == 0) {
                 sender.sendMessage(ChatColor.RED + "Usage: piratecoveplugin /<command>");
             }
-            if(args.length > 0){
-                if(args[0].equalsIgnoreCase("reload")){
+            if (args.length > 0) {
+                if (args[0].equalsIgnoreCase("reload")) {
                     sender.sendMessage(ChatColor.GOLD + "Reloaded piratecoveplugin config");
                     reloadConfig();
                     return true;
@@ -153,10 +168,10 @@ public class PiratecovePlugin extends JavaPlugin{
 
     @Override
     public void onDisable() {
+        writePlayerHomes();
         getLogger().info("Disabled PiratecovePlugin");
-        Bukkit.getServer().broadcastMessage(ChatColor.RED + "The custom PiratecovePlugin has been disabled due to an error. Features like night skipping, /home and " + ChatColor.MAGIC + "custom achievements" + ChatColor.RED + " will not work.");
+        //Bukkit.getServer().broadcastMessage(ChatColor.RED + "The custom PiratecovePlugin has been disabled due to an error. Features like night skipping, /home and " + ChatColor.MAGIC + "custom achievements" + ChatColor.RED + " will not work.");
     }
-
 
 
     /*
@@ -188,119 +203,115 @@ public class PiratecovePlugin extends JavaPlugin{
         }
     }
 */
-private boolean tpaRequestHandler(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String commandLabel, String[] args){
+    private boolean tpaRequestHandler(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String commandLabel, String[] args) {
 
-    Player p = null;
-    if (sender instanceof Player) {
-        p = (Player) sender;
-    }
+        Player p = null;
+        if (sender instanceof Player) {
+            p = (Player) sender;
+        }
 
-    if (cmd.getName().equalsIgnoreCase("tpa")) {
-        if (!(p == null)) {
-            int cooldown = 60;
-            if (tpaCooldown.containsKey(p.getName())) {
-                long diff = (System.currentTimeMillis() - tpaCooldown.get(sender.getName())) / 1000;
-                if (diff < cooldown) {
-                    p.sendMessage(ChatColor.RED + "Error: You must wait a " + cooldown + " second cooldown in between teleport requests!");
-                    return false;
-                }
-            }
-
-            if (args.length > 0) {
-                final Player target = getServer().getPlayer(args[0]);
-                long keepAlive = 30 * 20;
-
-                if (target == null) {
-                    sender.sendMessage(ChatColor.RED + "Error: You can only send a teleport request to online players!");
-                    return false;
-                }
-
-                if (target == p) {
-                    sender.sendMessage(ChatColor.RED + "Error: You can't teleport to yourself!");
-                    return false;
-                }
-
-                sendRequest(p, target);
-
-                getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-                    public void run() {
-                        killRequest(target.getName());
+        if (cmd.getName().equalsIgnoreCase("tpa")) {
+            if (!(p == null)) {
+                int cooldown = 60;
+                if (tpaCooldown.containsKey(p.getName())) {
+                    long diff = (System.currentTimeMillis() - tpaCooldown.get(sender.getName())) / 1000;
+                    if (diff < cooldown) {
+                        p.sendMessage(ChatColor.RED + "Error: You must wait a " + cooldown + " second cooldown in between teleport requests!");
+                        return false;
                     }
-                }, keepAlive);
+                }
 
-                tpaCooldown.put(p.getName(), System.currentTimeMillis());
-            } else {
-                p.sendMessage("Send a teleport request to a player.");
-                p.sendMessage("/tpa <player>");
-            }
-        } else {
-            sender.sendMessage(ChatColor.RED + "Error: The console can't teleport to people, silly!");
-            return false;
-        }
-        return true;
-    }
+                if (args.length > 0) {
+                    final Player target = getServer().getPlayer(args[0]);
+                    long keepAlive = 30 * 20;
 
-    if (cmd.getName().equalsIgnoreCase("tpaccept")) {
-        if (!(p == null)) {
-            if (currentRequest.containsKey(p.getName())) {
+                    if (target == null) {
+                        sender.sendMessage(ChatColor.RED + "Error: You can only send a teleport request to online players!");
+                        return false;
+                    }
 
-                Player heIsGoingOutOnADate = getServer().getPlayer(currentRequest.get(p.getName()));
-                currentRequest.remove(p.getName());
+                    if (target == p) {
+                        sender.sendMessage(ChatColor.RED + "Error: You can't teleport to yourself!");
+                        return false;
+                    }
 
-                if (!(heIsGoingOutOnADate == null)) {
-                    heIsGoingOutOnADate.teleport(p);
-                    p.sendMessage(ChatColor.GRAY + "Teleporting...");
-                    heIsGoingOutOnADate.sendMessage(ChatColor.GRAY + "Teleporting...");
+                    sendRequest(p, target);
+
+                    getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+                        public void run() {
+                            killRequest(target.getName());
+                        }
+                    }, keepAlive);
+
+                    tpaCooldown.put(p.getName(), System.currentTimeMillis());
                 } else {
-                    sender.sendMessage(ChatColor.RED + "Error: It appears that the person trying to teleport to you doesn't exist anymore. WHOA!");
+                    p.sendMessage("Send a teleport request to a player.");
+                    p.sendMessage("/tpa <player>");
+                }
+            } else {
+                sender.sendMessage(ChatColor.RED + "Error: The console can't teleport to people, silly!");
+                return false;
+            }
+            return true;
+        }
+
+        if (cmd.getName().equalsIgnoreCase("tpaccept")) {
+            if (!(p == null)) {
+                if (currentRequest.containsKey(p.getName())) {
+
+                    Player heIsGoingOutOnADate = getServer().getPlayer(currentRequest.get(p.getName()));
+                    currentRequest.remove(p.getName());
+
+                    if (!(heIsGoingOutOnADate == null)) {
+                        heIsGoingOutOnADate.teleport(p);
+                        p.sendMessage(ChatColor.GRAY + "Teleporting...");
+                        heIsGoingOutOnADate.sendMessage(ChatColor.GRAY + "Teleporting...");
+                    } else {
+                        sender.sendMessage(ChatColor.RED + "Error: It appears that the person trying to teleport to you doesn't exist anymore. WHOA!");
+                        return false;
+                    }
+                } else {
+                    sender.sendMessage(ChatColor.RED + "Error: It doesn't appear that there are any current tp requests. Maybe it timed out?");
                     return false;
                 }
             } else {
-                sender.sendMessage(ChatColor.RED + "Error: It doesn't appear that there are any current tp requests. Maybe it timed out?");
+                sender.sendMessage(ChatColor.RED + "Error: The console can't accept teleport requests, silly!");
                 return false;
             }
-        } else {
-            sender.sendMessage(ChatColor.RED + "Error: The console can't accept teleport requests, silly!");
-            return false;
+            return true;
         }
-        return true;
-    }
 
-    if (cmd.getName().equalsIgnoreCase("tpdeny")) {
-        if (!(p == null)) {
-            if (currentRequest.containsKey(p.getName())) {
-                Player poorRejectedGuy = getServer().getPlayer(currentRequest.get(p.getName()));
-                currentRequest.remove(p.getName());
+        if (cmd.getName().equalsIgnoreCase("tpdeny")) {
+            if (!(p == null)) {
+                if (currentRequest.containsKey(p.getName())) {
+                    Player poorRejectedGuy = getServer().getPlayer(currentRequest.get(p.getName()));
+                    currentRequest.remove(p.getName());
 
-                if (!(poorRejectedGuy == null)) {
-                    poorRejectedGuy.sendMessage(ChatColor.RED + p.getName() + " rejected your teleport request! :(");
-                    p.sendMessage(ChatColor.GRAY + poorRejectedGuy.getName() + " was rejected!");
-                    return true;
+                    if (!(poorRejectedGuy == null)) {
+                        poorRejectedGuy.sendMessage(ChatColor.RED + p.getName() + " rejected your teleport request! :(");
+                        p.sendMessage(ChatColor.GRAY + poorRejectedGuy.getName() + " was rejected!");
+                        return true;
+                    }
+                } else {
+                    sender.sendMessage(ChatColor.RED + "Error: It doesn't appear that there are any current tp requests. Maybe it timed out?");
+                    return false;
                 }
             } else {
-                sender.sendMessage(ChatColor.RED + "Error: It doesn't appear that there are any current tp requests. Maybe it timed out?");
+                sender.sendMessage(ChatColor.RED + "Error: The console can't deny teleport requests, silly!");
                 return false;
             }
-        } else {
-            sender.sendMessage(ChatColor.RED + "Error: The console can't deny teleport requests, silly!");
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
-    return false;
-}
-    public boolean killRequest(String key) {
+
+    public void killRequest(String key) {
         if (currentRequest.containsKey(key)) {
             Player loser = getServer().getPlayer(currentRequest.get(key));
             if (!(loser == null)) {
                 loser.sendMessage(ChatColor.RED + "Your teleport request timed out.");
             }
-
             currentRequest.remove(key);
-
-            return true;
-        } else {
-            return false;
         }
     }
 
@@ -318,10 +329,24 @@ private boolean tpaRequestHandler(@NotNull CommandSender sender, @NotNull Comman
         currentRequest.put(recipient.getName(), sender.getName());
     }
 
-    public void loadConfig(){
-        getConfig().addDefault("enableCustomAchievements",false);
+    public void loadConfig() {
+        getConfig().addDefault("enableCustomAchievements", false);
         getConfig().options().copyDefaults(true);
         saveConfig();
+    }
 
+    public void writePlayerHomes(){
+        try {
+            for(Map.Entry<Player,Location> entry : playerHomes.entrySet()){
+                String playername = entry.getKey().getName();
+                String homeLocation = entry.getValue().getWorld().getName() + ":" + entry.getValue().getBlockX() + ":" + entry.getValue().getBlockY() + ":" + entry.getValue().getBlockZ();
+                FileWriter fileWriter = new FileWriter("C:\\MCServerFiles\\playerHomes.txt");
+                fileWriter.write(playername + "-" + homeLocation);
+                fileWriter.flush();
+                fileWriter.close();
+            }
+        } catch (IOException exception) {
+            Bukkit.getLogger().info("An IOException has occured during the writing of the players homes");
+        }
     }
 }

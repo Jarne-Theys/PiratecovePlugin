@@ -16,19 +16,20 @@ import java.util.ArrayList;
 
 public class AchievementHandler implements Listener {
     private PiratecovePlugin instance;
-    public AchievementHandler(PiratecovePlugin instance){
+
+    public AchievementHandler(PiratecovePlugin instance) {
         this.instance = instance;
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        if(instance.getConfig().getBoolean("enableCustomAchievements")){
+        if (instance.getConfig().getBoolean("enableCustomAchievements")) {
             ArrayList<String> registeredPlayers = new ArrayList<>();
             try {
                 Object object = new JSONParser().parse(new FileReader("C:\\MCServerFiles\\achievements.json"));
                 JSONObject jo = (JSONObject) object;
                 for (Object string : jo.keySet()) {
-                    if(!registeredPlayers.contains(string.toString())){
+                    if (!registeredPlayers.contains(string.toString())) {
                         registeredPlayers.add(string.toString());
                     }
                 }

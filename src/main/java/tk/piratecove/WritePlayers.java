@@ -32,7 +32,7 @@ public class WritePlayers implements CommandExecutor {
                     Player player1 = (Player) player;
                     String playername = player1.getName();
                     double health = player1.getHealth();
-                    int lifetime = player1.getTicksLived()/20;
+                    int lifetime = player1.getTicksLived() / 20;
                     fileWriter.write("Playername: " + playername + " Health: " + health + " Lifetime: " + lifetime);
                     fileWriter.flush();
                     fileWriter.close();
