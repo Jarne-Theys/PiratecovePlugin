@@ -171,7 +171,6 @@ public class PiratecovePlugin extends JavaPlugin {
     public void onDisable() {
         writePlayerHomes();
         getLogger().info("Disabled PiratecovePlugin");
-        //Bukkit.getServer().broadcastMessage(ChatColor.RED + "The custom PiratecovePlugin has been disabled due to an error. Features like night skipping, /home and " + ChatColor.MAGIC + "custom achievements" + ChatColor.RED + " will not work.");
     }
 
 
@@ -220,8 +219,7 @@ public class PiratecovePlugin extends JavaPlugin {
                         return false;
                     }
                 }
-
-                if (args.length > 0) {
+                if (args.length == 1) {
                     final Player target = getServer().getPlayer(args[0]);
                     long keepAlive = 30 * 20;
 
@@ -242,11 +240,9 @@ public class PiratecovePlugin extends JavaPlugin {
                             killRequest(target.getName());
                         }
                     }, keepAlive);
-
                     tpaCooldown.put(p.getName(), System.currentTimeMillis());
                 } else {
-                    p.sendMessage("Send a teleport request to a player.");
-                    p.sendMessage("/tpa <player>");
+                    p.sendMessage("Your command has to many arguments!");
                 }
             } else {
                 sender.sendMessage(ChatColor.RED + "Error: The console can't teleport to people, silly!");
