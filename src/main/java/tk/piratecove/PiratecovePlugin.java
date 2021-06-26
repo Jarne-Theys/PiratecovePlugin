@@ -55,7 +55,7 @@ public class PiratecovePlugin extends JavaPlugin {
     static Map<String, Long> tpaCooldown = new HashMap<String, Long>();
     static Map<String, String> currentRequest = new HashMap<String, String>();
 
-    public static Map<Player, Location> playerHomes = new HashMap<>();
+    public Map<Player, Location> playerHomes = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -64,8 +64,8 @@ public class PiratecovePlugin extends JavaPlugin {
         this.getCommand("writePLayers").setExecutor(new WritePlayers());
         this.getCommand("explode").setExecutor(new Explode());
         this.getCommand("isSlimeChunk").setExecutor(new IsSlimeChunk());
-        this.getCommand("sethome").setExecutor(new Sethome());
-        this.getCommand("home").setExecutor(new Home());
+        this.getCommand("sethome").setExecutor(new Sethome(this));
+        this.getCommand("home").setExecutor(new Home(this));
         this.getCommand("smite").setExecutor(new Smite());
         this.getCommand("sunny").setExecutor(new Sunny());
         this.getCommand("tpa").setExecutor(this);
@@ -93,10 +93,10 @@ public class PiratecovePlugin extends JavaPlugin {
         try {
             Object object = new JSONParser().parse(new FileReader("C:\\MCServerFiles\\achievements.json"));
             JSONObject jo = (JSONObject) object;
-            for (Object string : jo.keySet()) {
-                Map Fileachievements = (Map) jo.get(string);
+            for (Object player : jo.keySet()) {
+                Map Fileachievements = (Map) jo.get(player);
                 Iterator<Map.Entry> itr1 = Fileachievements.entrySet().iterator();
-                currentPlayer = (String) string;
+                currentPlayer = (String) player;
                 while (itr1.hasNext()) {
                     var pair = itr1.next();
                     currentAchievementKey = (String) pair.getKey();
@@ -111,13 +111,14 @@ public class PiratecovePlugin extends JavaPlugin {
                 result.put(currentPlayer, newAchievements);
             }
             for (OfflinePlayer player : allPlayers) {
-                if (!result.containsKey(player.getName())) {
-                    Map<String, String> newPlayerAchievements = new HashMap<>();
-                    for (String achievement : achievementNames) {
-                        newPlayerAchievements.put(achievement, "0");
+                    if (!result.containsKey(player.getName())) {
+                        Map<String, String> newPlayerAchievements = new HashMap<>();
+                        for (String achievement : achievementNames) {
+                            newPlayerAchievements.put(achievement, "0");
+                        }
+                        result.put(player.getName(), newPlayerAchievements);
                     }
-                    result.put(player.getName(), newPlayerAchievements);
-                }
+
             }
         } catch (FileNotFoundException exception) {
             getLogger().info("Initialise custom achievements failed: File not found");
@@ -162,7 +163,7 @@ public class PiratecovePlugin extends JavaPlugin {
                 }
             }
         }
-        return false;
+        return tpaRequestHandler(sender,cmd,commandLabel,args);
     }
 
 
@@ -204,7 +205,6 @@ public class PiratecovePlugin extends JavaPlugin {
     }
 */
     private boolean tpaRequestHandler(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String commandLabel, String[] args) {
-
         Player p = null;
         if (sender instanceof Player) {
             p = (Player) sender;
@@ -333,6 +333,10 @@ public class PiratecovePlugin extends JavaPlugin {
         getConfig().addDefault("enableCustomAchievements", false);
         getConfig().options().copyDefaults(true);
         saveConfig();
+    }
+
+    public Map<Player, Location> getPlayerHomes(){
+        return playerHomes;
     }
 
     public void writePlayerHomes(){
