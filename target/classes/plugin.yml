@@ -1,5 +1,5 @@
 name: PiratecovePlugin
-version: 1.5
+version: 1.5.2
 main: tk.piratecove.PiratecovePlugin
 load: STARTUP
 author: CaptainCapsize
@@ -22,6 +22,9 @@ commands:
     description: Smite a player, and optionally do damage
     usage: /<command> player damage
     permission: Smite
+  sethome:
+    description: Sets the current location as the home location
+    usage: /<command>
   home:
     description: Teleport yourself to your spawn location
     usage: /<command>
