@@ -1,7 +1,7 @@
 name: PiratecovePlugin
-version: 1.5.3
+version: 1.5.4
 main: tk.piratecove.PiratecovePlugin
-load: STARTUP
+load: POSTWORLD
 author: CaptainCapsize
 description: Not a troll
 api-version: 1.16

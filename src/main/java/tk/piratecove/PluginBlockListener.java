@@ -38,7 +38,7 @@ public class PluginBlockListener implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        if (logs.contains(event.getBlock().getType()) && event.getPlayer().getInventory().getItemInMainHand().getType().name().toLowerCase().contains("axe") && !event.getPlayer().getInventory().getItemInMainHand().getType().name().toLowerCase().contains("pickaxe")) {
+        if (logs.contains(event.getBlock().getType()) && event.getPlayer().getInventory().getItemInMainHand().getType().name().toLowerCase().contains("axe") && !event.getPlayer().getInventory().getItemInMainHand().getType().name().toLowerCase().contains("pickaxe") && event.getPlayer().isSneaking()) {
 
             Player player = event.getPlayer();
             ItemStack handItem = player.getInventory().getItemInMainHand();

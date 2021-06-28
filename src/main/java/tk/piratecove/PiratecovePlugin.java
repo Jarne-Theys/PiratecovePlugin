@@ -1,10 +1,7 @@
 package tk.piratecove;
 
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -14,21 +11,15 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 //TODO READ HOME VALUES FROM FILE ON STARTUP
 
 public class PiratecovePlugin extends JavaPlugin {
     private Map<String, Map<String, String>> customAchievements;
 
-    ArrayList<String> achievementNames = new ArrayList<>() {{
+    private final ArrayList<String> achievementNames = new ArrayList<>() {{
         //-----Player events-----
         add("Mob kills");
         add("Blocks broken");
@@ -52,14 +43,19 @@ public class PiratecovePlugin extends JavaPlugin {
          */
     }};
 
-    static Map<String, Long> tpaCooldown = new HashMap<String, Long>();
-    static Map<String, String> currentRequest = new HashMap<String, String>();
+    public Map<String, Long> tpaCooldown = new HashMap<String, Long>();
+    public Map<String, String> currentRequest = new HashMap<String, String>();
 
-    public Map<Player, Location> playerHomes = new HashMap<>();
+    private Map<Player, Location> playerHomes = new HashMap<>();
 
     @Override
     public void onEnable() {
         loadConfig();
+        writePlayers();
+
+        Bukkit.getLogger().info("Pre setup playerhomes: " + playerHomes);
+        readPlayerHomes();
+        Bukkit.getLogger().info("Post setup playerhomes: " + playerHomes);
 
         this.getCommand("writePLayers").setExecutor(new WritePlayers());
         this.getCommand("explode").setExecutor(new Explode());
@@ -72,7 +68,7 @@ public class PiratecovePlugin extends JavaPlugin {
         this.getCommand("tpaccept").setExecutor(this);
         this.getCommand("tpdeny").setExecutor(this);
 
-        getServer().getPluginManager().registerEvents(new EventListener(), this);
+        getServer().getPluginManager().registerEvents(new EventListener(this), this);
         getServer().getPluginManager().registerEvents(new PluginBlockListener(), this);
         getServer().getPluginManager().registerEvents(new AchievementHandler(this), this);
 
@@ -166,23 +162,17 @@ public class PiratecovePlugin extends JavaPlugin {
         return tpaRequestHandler(sender,cmd,commandLabel,args);
     }
 
-
     @Override
     public void onDisable() {
-        writePlayerHomes();
         getLogger().info("Disabled PiratecovePlugin");
     }
 
-
-    /*
-    private void writePlayers() {
+    public void writePlayers() {
         writePlayers(null);
     }
 
-    private void writePlayers(Player leavingPlayer) {
-        Logger log = Bukkit.getLogger();
+    public void writePlayers(Player leavingPlayer) {
         Collection<? extends Player> players = Bukkit.getServer().getOnlinePlayers();
-            File file = new File("C:\\MCServerFiles\\players.txt");
         try {
             FileWriter fileWriter = new FileWriter("C:\\MCServerFiles\\players.txt");
             for (Object player : players) {
@@ -190,19 +180,19 @@ public class PiratecovePlugin extends JavaPlugin {
                     Player player1 = (Player) player;
                     if (player1 != leavingPlayer) {
                         String playername = player1.getName();
-                        double health = player1.getHealth();
-                        int lifetime = player1.getTicksLived() / 20;
-                        fileWriter.write("Playername: " + playername + " Health: " + health + " Lifetime: " + lifetime);
+                        String world = player1.getWorld().getName();
+                        int lifetime = player1.getTicksLived()/20;
+                        fileWriter.write("Playername: " + playername + " World: " + world + "Lifetime: " + lifetime);
                         fileWriter.flush();
                         fileWriter.close();
                     }
                 }
             }
         } catch (IOException exception) {
-            log.info("An IOException has occured during the writing of the players file");
+            Bukkit.getServer().getLogger().info("An IOException has occured during the writing of the players file");
         }
     }
-*/
+
     private boolean tpaRequestHandler(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String commandLabel, String[] args) {
         Player p = null;
         if (sender instanceof Player) {
@@ -335,18 +325,43 @@ public class PiratecovePlugin extends JavaPlugin {
         return playerHomes;
     }
 
+    public void setPlayerHomes(Map<Player,Location> playerHomes){
+        this.playerHomes=playerHomes;
+    }
+
     public void writePlayerHomes(){
         try {
             for(Map.Entry<Player,Location> entry : playerHomes.entrySet()){
                 String playername = entry.getKey().getName();
-                String homeLocation = entry.getValue().getWorld().getName() + ":" + entry.getValue().getBlockX() + ":" + entry.getValue().getBlockY() + ":" + entry.getValue().getBlockZ();
+                String homeLocation = entry.getValue().getBlockX() + ":" + entry.getValue().getBlockY() + ":" + entry.getValue().getBlockZ();
                 FileWriter fileWriter = new FileWriter("C:\\MCServerFiles\\playerHomes.txt");
-                fileWriter.write(playername + "-" + homeLocation);
+                fileWriter.write(playername + ";" + homeLocation);
                 fileWriter.flush();
                 fileWriter.close();
             }
         } catch (IOException exception) {
             Bukkit.getLogger().info("An IOException has occured during the writing of the players homes");
+        }
+    }
+
+    public void readPlayerHomes(){
+        World overworld = Bukkit.getServer().getWorlds().get(0);
+        try{
+            File file = new File("C:\\MCServerFiles\\playerHomes.txt");
+            Scanner scanner = new Scanner(file);
+            while(scanner.hasNextLine()){
+                String[] data = scanner.nextLine().split(";");
+                String[] locationData = data[1].split(":");
+                Player player = Bukkit.getServer().getPlayer(data[0]);
+                if (player != null) {
+                    Location location = new Location(overworld,Double.parseDouble(locationData[0]),Double.parseDouble(locationData[1]),Double.parseDouble(locationData[2]));
+                    playerHomes.put(player,location);
+                } else {
+                    Bukkit.getLogger().info("Skipped adding " + data[0] + " because they are not online!");
+                }
+            }
+        } catch (FileNotFoundException e) {
+            Bukkit.getLogger().info("FileNotFoundException in readPLayerHomes");
         }
     }
 }

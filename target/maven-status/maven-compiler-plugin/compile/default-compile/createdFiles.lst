@@ -2,6 +2,7 @@ tk\piratecove\Tester.class
 tk\piratecove\PluginBlockListener$1.class
 tk\piratecove\WritePlayers.class
 tk\piratecove\PluginBlockListener$2.class
+tk\piratecove\Sethome.class
 tk\piratecove\PiratecovePlugin$1.class
 tk\piratecove\Smite.class
 tk\piratecove\IsSlimeChunk.class
@@ -11,4 +12,5 @@ tk\piratecove\Home.class
 tk\piratecove\PluginBlockListener.class
 tk\piratecove\Explode.class
 tk\piratecove\EventListener.class
+tk\piratecove\AchievementHandler.class
 tk\piratecove\Sunny.class

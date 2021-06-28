@@ -6,10 +6,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import static org.bukkit.event.player.PlayerBedEnterEvent.BedEnterResult.OK;
 
 public class EventListener implements Listener {
+    PiratecovePlugin instance;
+    public EventListener(PiratecovePlugin instance){
+        this.instance=instance;
+    }
 
     @EventHandler
     public void playerBedEnterEvent(PlayerBedEnterEvent event) {
@@ -24,6 +29,14 @@ public class EventListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
         Bukkit.getServer().broadcastMessage("Currently working commands:\n/sethome - /home - /sunny - /isSlimeChunk\nCurrently known issues: None");
+        instance.writePlayers();
+        instance.readPlayerHomes();
+    }
+
+    @EventHandler
+    public void onLeave(PlayerQuitEvent event){
+        instance.writePlayers(event.getPlayer());
+        instance.writePlayerHomes();
     }
 
 }

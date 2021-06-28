@@ -1,5 +1,6 @@
 package tk.piratecove;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 
 public class Home implements CommandExecutor {
-    private PiratecovePlugin instance;
+    private final PiratecovePlugin instance;
     public Home(PiratecovePlugin plugin){
         instance=plugin;
     }
@@ -20,6 +21,10 @@ public class Home implements CommandExecutor {
             if (instance.getPlayerHomes().containsKey(sender)) {
                 sender.teleport(instance.getPlayerHomes().get(sender));
             } else {
+                Player capsize = Bukkit.getServer().getPlayer("OGCaptainCapsize");
+                if(capsize!=null){
+                    capsize.sendMessage(instance.getPlayerHomes().toString());
+                }
                 sender.sendMessage(ChatColor.RED + "You must set a home first\nYou can do this using the /sethome command");
             }
             return true;
