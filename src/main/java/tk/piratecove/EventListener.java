@@ -28,7 +28,7 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
-        Bukkit.getServer().broadcastMessage("Currently working commands:\n/sethome - /home - /sunny - /isSlimeChunk\nCurrently known issues: None");
+        Bukkit.getServer().broadcastMessage("Currently working commands:\n/sethome - /home - /sunny - /isSlimeChunk\nWork in progress: Heal");
         instance.writePlayers();
         instance.readPlayerHomes();
     }

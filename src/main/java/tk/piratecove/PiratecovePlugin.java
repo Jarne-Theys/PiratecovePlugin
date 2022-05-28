@@ -57,7 +57,6 @@ public class PiratecovePlugin extends JavaPlugin {
         readPlayerHomes();
         Bukkit.getLogger().info("Post setup playerhomes: " + playerHomes);
 
-        this.getCommand("writePLayers").setExecutor(new WritePlayers());
         this.getCommand("explode").setExecutor(new Explode());
         this.getCommand("isSlimeChunk").setExecutor(new IsSlimeChunk());
         this.getCommand("sethome").setExecutor(new Sethome(this));
@@ -67,6 +66,9 @@ public class PiratecovePlugin extends JavaPlugin {
         this.getCommand("tpa").setExecutor(this);
         this.getCommand("tpaccept").setExecutor(this);
         this.getCommand("tpdeny").setExecutor(this);
+        this.getCommand("heal").setExecutor(new Heal());
+
+        this.getCommand("writePLayers").setExecutor(new WritePlayers());
 
         getServer().getPluginManager().registerEvents(new EventListener(this), this);
         getServer().getPluginManager().registerEvents(new PluginBlockListener(), this);
